@@ -147,6 +147,7 @@ class BookingsControllerTest {
 
         Booking updatedBooking = new Booking();
         updatedBooking.setName("updatedName");
+        updatedBooking.setDate(date);
 
         given(bookingService.updateBooking(any(Booking.class))).willReturn(updatedBooking);
 
