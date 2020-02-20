@@ -17,10 +17,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class SportClassServiceTest {
@@ -130,7 +131,8 @@ class SportClassServiceTest {
         SportClass result = classToTest.updateSportClass(sportClass);
 
         //Then
-        verifyNoInteractions(sportClassRepository);
+        verify(sportClassRepository).existsById(1);
+        verify(sportClassRepository, times(0)).save(any());
     }
 
     @Test
