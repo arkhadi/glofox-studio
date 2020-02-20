@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +20,7 @@ public class SportClassController {
     private final SportClassService sportClassService;
 
     @PostMapping
-    public ResponseEntity<SportClass>  createSportClass(@RequestBody SportClass sportClass) {
+    public ResponseEntity<SportClass>  createSportClass(@Valid @RequestBody SportClass sportClass) {
         return ResponseEntity.ok(sportClassService.saveSportClass(sportClass));
     }
 
@@ -35,7 +36,7 @@ public class SportClassController {
     }
 
     @PutMapping
-    public ResponseEntity<SportClass> updateSportClass(@RequestBody SportClass sportClass) {
+    public ResponseEntity<SportClass> updateSportClass(@Valid @RequestBody SportClass sportClass) {
         return ResponseEntity.ok(sportClassService.updateSportClass(sportClass));
     }
 

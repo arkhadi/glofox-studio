@@ -2,18 +2,22 @@ package com.glofox.app.studio.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.glofox.app.studio.entity.Booking;
 import com.glofox.app.studio.service.BookingService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -30,16 +34,25 @@ class BookingsControllerTest {
     @MockBean
     private BookingService bookingService;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
 
     @Autowired
     private MockMvc mvc;
 
+    @BeforeEach
+    void setUp() {
+        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
+        objectMapper = builder.modulesToInstall(new JavaTimeModule()).build();
+    }
+
     @Test
     void shouldCreateBooking() throws Exception {
         //Given
+        LocalDate date = LocalDate.of(2020, 2, 20);
+
         Booking booking = new Booking();
         booking.setName("name");
+        booking.setDate(date);
 
         given(bookingService.saveBooking(any(Booking.class))).willReturn(booking);
 
@@ -53,6 +66,28 @@ class BookingsControllerTest {
         //Then
         Booking resultObject =  objectMapper.readValue(result.getResponse().getContentAsString(), Booking.class);
         assertThat(resultObject.getName()).isEqualTo("name");
+        assertThat(resultObject.getDate()).isEqualTo(date);
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenCreateBookingValidationFails() throws Exception {
+        //Given
+        LocalDate date = LocalDate.of(2020, 2, 20);
+
+        Booking booking = new Booking();
+        given(bookingService.saveBooking(any(Booking.class))).willReturn(booking);
+
+        //When
+        MvcResult result = mvc.perform(post("/bookings")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(booking)))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        //Then
+        assertThat(result).isNotNull();
+        assertThat(result.getResponse().getContentAsString()).contains("Name is mandatory", "Date is mandatory");
     }
 
     @Test
@@ -104,8 +139,11 @@ class BookingsControllerTest {
     @Test
     void shouldUpdateBooking() throws Exception {
         //Given
+        LocalDate date = LocalDate.of(2020, 2, 20);
+
         Booking booking = new Booking();
         booking.setName("name");
+        booking.setDate(date);
 
         Booking updatedBooking = new Booking();
         updatedBooking.setName("updatedName");
@@ -122,6 +160,26 @@ class BookingsControllerTest {
         //Then
         Booking resultObject =  objectMapper.readValue(result.getResponse().getContentAsString(), Booking.class);
         assertThat(resultObject.getName()).isEqualTo("updatedName");
+        assertThat(resultObject.getDate()).isEqualTo(date);
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenUpdateBookingValidationFails() throws Exception {
+        //Given
+        Booking booking = new Booking();
+        given(bookingService.saveBooking(any(Booking.class))).willReturn(booking);
+
+        //When
+        MvcResult result = mvc.perform(put("/bookings")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(booking)))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        //Then
+        assertThat(result).isNotNull();
+        assertThat(result.getResponse().getContentAsString()).contains("Name is mandatory", "Date is mandatory");
     }
 
     @Test

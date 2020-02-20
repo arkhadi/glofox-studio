@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +20,7 @@ public class BookingsController {
     private final BookingService bookingService;
 
     @PostMapping
-    public ResponseEntity<Booking>  createBooking(@RequestBody Booking booking) {
+    public ResponseEntity<Booking>  createBooking(@Valid @RequestBody Booking booking) {
         return ResponseEntity.ok(bookingService.saveBooking(booking));
     }
 
@@ -35,7 +36,7 @@ public class BookingsController {
     }
 
     @PutMapping
-    public ResponseEntity<Booking> updateBooking(@RequestBody Booking booking) {
+    public ResponseEntity<Booking> updateBooking(@Valid @RequestBody Booking booking) {
         return  ResponseEntity.ok(bookingService.updateBooking(booking));
     }
 

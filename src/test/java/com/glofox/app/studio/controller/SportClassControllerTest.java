@@ -2,18 +2,22 @@ package com.glofox.app.studio.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.glofox.app.studio.entity.SportClass;
 import com.glofox.app.studio.service.SportClassService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -31,16 +35,26 @@ class SportClassControllerTest {
     @MockBean
     private SportClassService sportClassService;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
 
     @Autowired
     private MockMvc mvc;
 
+    @BeforeEach
+    void setUp() {
+        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
+        objectMapper = builder.modulesToInstall(new JavaTimeModule()).build();
+    }
+
     @Test
     void shouldCreateSportClass() throws Exception {
         //Given
+        LocalDate date = LocalDate.of(2020, 2, 20);
         SportClass sportClass = new SportClass();
         sportClass.setName("name");
+        sportClass.setCapacity(20);
+        sportClass.setStartDate(date);
+        sportClass.setEndDate(date);
 
         given(sportClassService.saveSportClass(any(SportClass.class))).willReturn(sportClass);
 
@@ -54,6 +68,27 @@ class SportClassControllerTest {
         //Then
         SportClass resultObject =  objectMapper.readValue(result.getResponse().getContentAsString(), SportClass.class);
         assertThat(resultObject.getName()).isEqualTo("name");
+        assertThat(resultObject.getCapacity()).isEqualTo(20);
+        assertThat(resultObject.getStartDate()).isEqualTo(date);
+        assertThat(resultObject.getEndDate()).isEqualTo(date);
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenCreateSportClassFailsToValidate() throws Exception {
+        //Given
+        SportClass sportClass = new SportClass();
+
+        //When
+
+        MvcResult result = mvc.perform(post("/classes")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sportClass)))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        //Then
+        assertThat(result).isNotNull();
+        assertThat(result.getResponse().getContentAsString()).contains("End Date is mandatory", "Name is mandatory", "Start Date is mandatory", "Capacity is mandatory");
     }
 
     @Test
@@ -108,8 +143,12 @@ class SportClassControllerTest {
     @Test
     void shouldUpdateSportClass() throws Exception {
         //Given
+        LocalDate date = LocalDate.of(2020, 2, 20);
         SportClass sportClass = new SportClass();
         sportClass.setName("name");
+        sportClass.setCapacity(20);
+        sportClass.setStartDate(date);
+        sportClass.setEndDate(date);
 
         SportClass updatedSportClass = new SportClass();
         updatedSportClass.setName("updatedName");
@@ -126,6 +165,25 @@ class SportClassControllerTest {
         //Then
         SportClass resultObject =  objectMapper.readValue(result.getResponse().getContentAsString(), SportClass.class);
         assertThat(resultObject.getName()).isEqualTo("updatedName");
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenUpdateSportClassFailsToValidate() throws Exception {
+        //Given
+        SportClass sportClass = new SportClass();
+
+        //When
+
+        MvcResult result = mvc.perform(put("/classes")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sportClass)))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        //Then
+        assertThat(result).isNotNull();
+        assertThat(result.getResponse().getContentAsString()).contains("End Date is mandatory", "Name is mandatory", "Start Date is mandatory", "Capacity is mandatory");
+
     }
 
     @Test
