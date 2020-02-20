@@ -28,9 +28,9 @@ public class SportClassController {
         return ResponseEntity.ok(sportClassService.findAllSportClasses());
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<SportClass> getSportClassByName(@PathVariable String name) {
-        Optional<SportClass> sportClassOptional = sportClassService.findSportClassByName(name);
+    @GetMapping("/{id}")
+    public ResponseEntity<SportClass> getSportClassByName(@PathVariable Integer id) {
+        Optional<SportClass> sportClassOptional = sportClassService.findSportClassById(id);
         return sportClassOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -39,10 +39,10 @@ public class SportClassController {
         return ResponseEntity.ok(sportClassService.updateSportClass(sportClass));
     }
 
-    @DeleteMapping("/{name}")
-    public ResponseEntity<String> deleteSportClass(@PathVariable String name) {
-        if(sportClassService.deleteSportClass(name)) {
-            return ResponseEntity.ok(StringFormatter.format("Sport Class with name: %s successfully deleted", name).getValue());
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteSportClass(@PathVariable Integer id) {
+        if(sportClassService.deleteSportClass(id)) {
+            return ResponseEntity.ok(StringFormatter.format("Sport Class with id: %s successfully deleted", id).getValue());
         }
         return ResponseEntity.notFound().build();
     }

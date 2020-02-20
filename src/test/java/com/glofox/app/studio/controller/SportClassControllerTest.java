@@ -77,27 +77,29 @@ class SportClassControllerTest {
     void shouldGetSportClassByNameStatusOk() throws Exception {
         //Given
         SportClass sportClass = new SportClass();
+        sportClass.setId(1);
         sportClass.setName("name");
 
-        given(sportClassService.findSportClassByName("name")).willReturn(Optional.of(sportClass));
+        given(sportClassService.findSportClassById(1)).willReturn(Optional.of(sportClass));
 
         //When
-        MvcResult result = mvc.perform(get("/classes/name"))
+        MvcResult result = mvc.perform(get("/classes/1"))
                 .andExpect(status().isOk())
                 .andReturn();
         //Then
         SportClass resultObject =  objectMapper.readValue(result.getResponse().getContentAsString(), SportClass.class);
+        assertThat(resultObject.getId()).isEqualTo(1);
         assertThat(resultObject.getName()).isEqualTo("name");
     }
 
     @Test
     void shouldGetSportClassByNameStatusNotFound() throws Exception {
         //Given
-        given(sportClassService.findSportClassByName("name")).willReturn(Optional.empty());
+        given(sportClassService.findSportClassById(1)).willReturn(Optional.empty());
 
         //When
         //Then
-        mvc.perform(get("/classes/name"))
+        mvc.perform(get("/classes/1"))
                 .andExpect(status().isNotFound())
                 .andReturn();
 
@@ -129,25 +131,25 @@ class SportClassControllerTest {
     @Test
     void shouldDeleteSportClassByNameStatusOk() throws Exception {
         //Given
-        given(sportClassService.deleteSportClass("name")).willReturn(true);
+        given(sportClassService.deleteSportClass(1)).willReturn(true);
 
         //When
-        MvcResult result = mvc.perform(delete("/classes/name"))
+        MvcResult result = mvc.perform(delete("/classes/1"))
                 .andExpect(status().isOk())
                 .andReturn();
         //Then
         String resultObject =  result.getResponse().getContentAsString();
-        assertThat(resultObject).isEqualTo("Sport Class with name: name successfully deleted");
+        assertThat(resultObject).isEqualTo("Sport Class with id: 1 successfully deleted");
     }
 
     @Test
     void shouldDeleteSportClassByNameStatusNotFound() throws Exception {
         //Given
-        given(sportClassService.deleteSportClass("name")).willReturn(false);
+        given(sportClassService.deleteSportClass(1)).willReturn(false);
 
         //When
         //Then
-        mvc.perform(delete("/classes/name"))
+        mvc.perform(delete("/classes/1"))
                 .andExpect(status().isNotFound())
                 .andReturn();
     }

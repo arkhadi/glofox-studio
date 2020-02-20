@@ -56,14 +56,16 @@ class SportClassServiceTest {
     void shouldFindSportClassByName() {
         //Given
         SportClass sportClass = new SportClass();
+        sportClass.setId(1);
         sportClass.setName("name");
-        given(sportClassRepository.findByName(eq("name"))).willReturn(Optional.of(sportClass));
+        given(sportClassRepository.findById(eq(1))).willReturn(Optional.of(sportClass));
 
         //When
-        Optional<SportClass> result = classToTest.findSportClassByName("name");
+        Optional<SportClass> result = classToTest.findSportClassById(1);
 
         //Then
         assertThat(result).isPresent();
+        assertThat(result.get().getId()).isEqualTo(1);
         assertThat(result.get().getName()).isEqualTo("name");
     }
 
@@ -72,10 +74,11 @@ class SportClassServiceTest {
         //Given
         SportClass sportClass = new SportClass();
         sportClass.setName("name");
-        given(sportClassRepository.findByName(eq("name"))).willReturn(Optional.empty());
+
+        given(sportClassRepository.findById(eq(1))).willReturn(Optional.empty());
 
         //When
-        Optional<SportClass> result = classToTest.findSportClassByName("name");
+        Optional<SportClass> result = classToTest.findSportClassById(1);
 
         //Then
         assertThat(result).isNotPresent();
@@ -139,12 +142,11 @@ class SportClassServiceTest {
     void shouldDeleteSportClass() {
         //Given
         SportClass sportClass = new SportClass();
-        sportClass.setName("name");
 
-        Mockito.doNothing().when(sportClassRepository).deleteByName("name");
+        Mockito.doNothing().when(sportClassRepository).deleteById(1);
 
         //When
-        boolean result = classToTest.deleteSportClass("name");
+        boolean result = classToTest.deleteSportClass(1);
 
         //Then
         assertThat(result).isTrue();
@@ -154,12 +156,11 @@ class SportClassServiceTest {
     void shouldNotDeleteSportClass() {
         //Given
         SportClass sportClass = new SportClass();
-        sportClass.setName("name");
 
-        Mockito.doThrow(EmptyResultDataAccessException.class).when(sportClassRepository).deleteByName("name");
+        Mockito.doThrow(EmptyResultDataAccessException.class).when(sportClassRepository).deleteById(1);
 
         //When
-        boolean result = classToTest.deleteSportClass("name");
+        boolean result = classToTest.deleteSportClass(1);
 
         //Then
         assertThat(result).isFalse();

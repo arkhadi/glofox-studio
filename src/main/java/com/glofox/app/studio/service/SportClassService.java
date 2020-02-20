@@ -20,8 +20,8 @@ public class SportClassService {
         return sportClassRepository.findAll();
     }
 
-    public Optional<SportClass> findSportClassByName(String name) {
-        return sportClassRepository.findByName(name);
+    public Optional<SportClass> findSportClassById(Integer id) {
+        return sportClassRepository.findById(id);
     }
 
     public SportClass saveSportClass(SportClass sportClass) {
@@ -35,9 +35,9 @@ public class SportClassService {
         return null;
     }
 
-    public boolean deleteSportClass(String name) {
+    public boolean deleteSportClass(Integer id) {
         try {
-            sportClassRepository.deleteByName(name);
+            sportClassRepository.deleteById(id);
             return true;
         } catch (EmptyResultDataAccessException erdae) {
             return false;
