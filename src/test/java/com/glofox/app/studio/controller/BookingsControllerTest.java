@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.glofox.app.studio.entity.Booking;
+import com.glofox.app.studio.entity.SportClass;
 import com.glofox.app.studio.service.BookingService;
+import com.glofox.app.studio.service.SportClassService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,8 +33,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(BookingsController.class)
 class BookingsControllerTest {
+
     @MockBean
     private BookingService bookingService;
+
+    @MockBean
+    private SportClassService sportClassService;
 
     private ObjectMapper objectMapper;
 
@@ -54,8 +60,12 @@ class BookingsControllerTest {
         booking.setName("name");
         booking.setDate(date);
 
-        given(bookingService.createBooking(any(Booking.class))).willReturn(booking);
+        SportClass sportClass = new SportClass();
+        sportClass.setStartDate(LocalDate.of(2020, 1, 20));
+        sportClass.setEndDate(LocalDate.of(2020, 3, 20));
 
+        given(bookingService.createBooking(any(Booking.class))).willReturn(booking);
+        given(sportClassService.findAllSportClasses()).willReturn(Collections.singletonList(sportClass));
         //When
         MvcResult result = mvc.perform(post("/bookings")
                 .accept(MediaType.APPLICATION_JSON)
@@ -70,10 +80,35 @@ class BookingsControllerTest {
     }
 
     @Test
-    void shouldReturnBadRequestWhenCreateBookingValidationFails() throws Exception {
+    void shouldReturnBadRequestWhenNoClassThatDay() throws Exception {
         //Given
         LocalDate date = LocalDate.of(2020, 2, 20);
 
+        Booking booking = new Booking();
+        booking.setName("name");
+        booking.setDate(date);
+
+        SportClass sportClass = new SportClass();
+        sportClass.setStartDate(LocalDate.of(2020, 2, 25));
+        sportClass.setEndDate(LocalDate.of(2020, 3, 20));
+
+        given(bookingService.createBooking(any(Booking.class))).willReturn(booking);
+        given(sportClassService.findAllSportClasses()).willReturn(Collections.singletonList(sportClass));
+        //When
+        MvcResult result = mvc.perform(post("/bookings")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(booking)))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        //Then
+        assertThat(result).isNotNull();
+        assertThat(result.getResponse().getContentAsString()).contains("No class available that day");
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenCreateBookingValidationFails() throws Exception {
+        //Given
         Booking booking = new Booking();
         given(bookingService.createBooking(any(Booking.class))).willReturn(booking);
 
@@ -149,7 +184,12 @@ class BookingsControllerTest {
         updatedBooking.setName("updatedName");
         updatedBooking.setDate(date);
 
+        SportClass sportClass = new SportClass();
+        sportClass.setStartDate(LocalDate.of(2020, 2, 18));
+        sportClass.setEndDate(LocalDate.of(2020, 3, 20));
+
         given(bookingService.updateBooking(any(Booking.class))).willReturn(updatedBooking);
+        given(sportClassService.findAllSportClasses()).willReturn(Collections.singletonList(sportClass));
 
         //When
         MvcResult result = mvc.perform(put("/bookings")
