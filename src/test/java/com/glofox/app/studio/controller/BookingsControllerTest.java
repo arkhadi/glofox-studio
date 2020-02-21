@@ -54,7 +54,7 @@ class BookingsControllerTest {
         booking.setName("name");
         booking.setDate(date);
 
-        given(bookingService.saveBooking(any(Booking.class))).willReturn(booking);
+        given(bookingService.createBooking(any(Booking.class))).willReturn(booking);
 
         //When
         MvcResult result = mvc.perform(post("/bookings")
@@ -75,7 +75,7 @@ class BookingsControllerTest {
         LocalDate date = LocalDate.of(2020, 2, 20);
 
         Booking booking = new Booking();
-        given(bookingService.saveBooking(any(Booking.class))).willReturn(booking);
+        given(bookingService.createBooking(any(Booking.class))).willReturn(booking);
 
         //When
         MvcResult result = mvc.perform(post("/bookings")
@@ -168,7 +168,7 @@ class BookingsControllerTest {
     void shouldReturnBadRequestWhenUpdateBookingValidationFails() throws Exception {
         //Given
         Booking booking = new Booking();
-        given(bookingService.saveBooking(any(Booking.class))).willReturn(booking);
+        given(bookingService.createBooking(any(Booking.class))).willReturn(booking);
 
         //When
         MvcResult result = mvc.perform(put("/bookings")

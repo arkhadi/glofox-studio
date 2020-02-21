@@ -27,4 +27,12 @@ localhost:8080/classes
 localhost:8080/bookings
 ```
 
+## Postman
+
+In order to test the app manually Postman is needed. 
+It can be downloaded and installed from: https://www.postman.com/downloads/
+
+
+
+
 

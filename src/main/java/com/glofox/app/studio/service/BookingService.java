@@ -16,7 +16,7 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
 
-    public Booking saveBooking(Booking booking) {
+    public Booking createBooking(Booking booking) {
         return bookingRepository.save(booking);
     }
 
@@ -30,7 +30,7 @@ public class BookingService {
 
     public Booking updateBooking(Booking booking) {
         if(bookingRepository.existsById(booking.getId())) {
-            return saveBooking(booking);
+            return createBooking(booking);
         }
         return null;
     }
