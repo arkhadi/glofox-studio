@@ -108,7 +108,7 @@ class SportClassControllerTest {
         sportClass.setEndDate(date);
 
         given(sportClassValidator.validate(any(SportClass.class))).willReturn("Failed to validate Dates");
-        
+
         //When
         MvcResult result = mvc.perform(post("/classes")
                 .accept(MediaType.APPLICATION_JSON)

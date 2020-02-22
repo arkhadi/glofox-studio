@@ -5,9 +5,11 @@ import com.glofox.app.studio.service.SportClassService;
 import com.sun.javafx.binding.StringFormatter;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class SportClassValidator {
 

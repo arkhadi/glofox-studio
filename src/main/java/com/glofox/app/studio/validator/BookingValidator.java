@@ -4,12 +4,14 @@ import com.glofox.app.studio.entity.SportClass;
 import com.glofox.app.studio.service.SportClassService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 import java.util.List;
 
+@Component
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class BookingValidator implements ConstraintValidator<BookingDate, LocalDate> {
 
