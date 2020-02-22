@@ -90,7 +90,7 @@ class BookingServiceTest {
         given(bookingRepository.save(captor.capture())).willReturn(booking);
 
         //When
-        Booking result = classToTest.saveBooking(booking);
+        Booking result = classToTest.createBooking(booking);
 
         //Then
         verify(bookingRepository).save(booking);

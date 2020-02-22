@@ -2,12 +2,14 @@ package com.glofox.app.studio.controller;
 
 import com.glofox.app.studio.entity.SportClass;
 import com.glofox.app.studio.service.SportClassService;
+import com.glofox.app.studio.validator.SportClassValidator;
 import com.sun.javafx.binding.StringFormatter;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,8 +20,14 @@ public class SportClassController {
 
     private final SportClassService sportClassService;
 
+    private final SportClassValidator sportClassValidator;
+
     @PostMapping
-    public ResponseEntity<SportClass>  createSportClass(@RequestBody SportClass sportClass) {
+    public ResponseEntity  createSportClass(@Valid @RequestBody SportClass sportClass) {
+        String validationErrors = sportClassValidator.validate(sportClass);
+        if(validationErrors != null) {
+            return ResponseEntity.badRequest().body(validationErrors);
+        }
         return ResponseEntity.ok(sportClassService.saveSportClass(sportClass));
     }
 
@@ -28,21 +36,21 @@ public class SportClassController {
         return ResponseEntity.ok(sportClassService.findAllSportClasses());
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<SportClass> getSportClassByName(@PathVariable String name) {
-        Optional<SportClass> sportClassOptional = sportClassService.findSportClassByName(name);
+    @GetMapping("/{id}")
+    public ResponseEntity<SportClass> getSportClassByName(@PathVariable Integer id) {
+        Optional<SportClass> sportClassOptional = sportClassService.findSportClassById(id);
         return sportClassOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping
-    public ResponseEntity<SportClass> updateSportClass(@RequestBody SportClass sportClass) {
+    public ResponseEntity<SportClass> updateSportClass(@Valid @RequestBody SportClass sportClass) {
         return ResponseEntity.ok(sportClassService.updateSportClass(sportClass));
     }
 
-    @DeleteMapping("/{name}")
-    public ResponseEntity<String> deleteSportClass(@PathVariable String name) {
-        if(sportClassService.deleteSportClass(name)) {
-            return ResponseEntity.ok(StringFormatter.format("Sport Class with name: %s successfully deleted", name).getValue());
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteSportClass(@PathVariable Integer id) {
+        if(sportClassService.deleteSportClass(id)) {
+            return ResponseEntity.ok(StringFormatter.format("Sport Class with id: %s successfully deleted", id).getValue());
         }
         return ResponseEntity.notFound().build();
     }

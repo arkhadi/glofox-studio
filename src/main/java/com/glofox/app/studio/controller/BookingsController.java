@@ -2,12 +2,14 @@ package com.glofox.app.studio.controller;
 
 import com.glofox.app.studio.entity.Booking;
 import com.glofox.app.studio.service.BookingService;
+import com.glofox.app.studio.validator.BookingValidator;
 import com.sun.javafx.binding.StringFormatter;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,9 +20,15 @@ public class BookingsController {
 
     private final BookingService bookingService;
 
+    private final BookingValidator bookingValidator;
+
     @PostMapping
-    public ResponseEntity<Booking>  createBooking(@RequestBody Booking booking) {
-        return ResponseEntity.ok(bookingService.saveBooking(booking));
+    public ResponseEntity  createBooking(@Valid @RequestBody Booking booking) {
+        String validationErrors = bookingValidator.validate(booking);
+        if(validationErrors != null) {
+            return ResponseEntity.badRequest().body(validationErrors);
+        }
+        return ResponseEntity.ok(bookingService.createBooking(booking));
     }
 
     @GetMapping
@@ -35,7 +43,7 @@ public class BookingsController {
     }
 
     @PutMapping
-    public ResponseEntity<Booking> updateBooking(@RequestBody Booking booking) {
+    public ResponseEntity<Booking> updateBooking(@Valid @RequestBody Booking booking) {
         return  ResponseEntity.ok(bookingService.updateBooking(booking));
     }
 
