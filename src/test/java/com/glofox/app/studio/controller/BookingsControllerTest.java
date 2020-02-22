@@ -7,6 +7,7 @@ import com.glofox.app.studio.entity.Booking;
 import com.glofox.app.studio.entity.SportClass;
 import com.glofox.app.studio.service.BookingService;
 import com.glofox.app.studio.service.SportClassService;
+import com.glofox.app.studio.validator.BookingValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +41,9 @@ class BookingsControllerTest {
     @MockBean
     private SportClassService sportClassService;
 
+    @MockBean
+    private BookingValidator bookingValidator;
+
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -64,6 +68,7 @@ class BookingsControllerTest {
         sportClass.setStartDate(LocalDate.of(2020, 1, 20));
         sportClass.setEndDate(LocalDate.of(2020, 3, 20));
 
+        given(bookingValidator.validate(any(Booking.class))).willReturn(null);
         given(bookingService.createBooking(any(Booking.class))).willReturn(booking);
         given(sportClassService.findAllSportClasses()).willReturn(Collections.singletonList(sportClass));
         //When
@@ -92,6 +97,7 @@ class BookingsControllerTest {
         sportClass.setStartDate(LocalDate.of(2020, 2, 25));
         sportClass.setEndDate(LocalDate.of(2020, 3, 20));
 
+        given(bookingValidator.validate(any(Booking.class))).willReturn("No class available that day");
         given(bookingService.createBooking(any(Booking.class))).willReturn(booking);
         given(sportClassService.findAllSportClasses()).willReturn(Collections.singletonList(sportClass));
         //When

@@ -29,10 +29,29 @@ localhost:8080/bookings
 
 ## Postman
 
-In order to test the app manually Postman is needed. 
+In order to test the app manually Postman is needed.
+
 It can be downloaded and installed from: https://www.postman.com/downloads/
+```
+Once postman is installed:
+    1. Open Postman
+    2. File -> Import
+    3. Search for the postman collection with all the rest calls in the project folder with path:
+        3.1.  src/main/resources/postman collection
+```
 
 
+## Comments
+- Persistence
 
+    I decided to not link the two entities as there is only the posibility of one class per given day the date is an unique identifier for the booking respect to the class.
+    Besides as it ws not necessary to take overbooking into account I let it out.
 
+- Validation
 
+    Validation is done in two different ways, one using Spring validation features and the more complex using custom validation classes.
+    Just added some validation for the fields and some constraints to prevent classes overlapping (it is mentioned one class per day) also the bookings are only allowed when the date requested has a class.
+    
+- Testing
+    
+    Unit tests have been added for all the classes with logic and I would have like to implement an integration test suite using Postman but given to the lack of time I only added the rest calls to the Postman collection without any flow to test the functionality together.
