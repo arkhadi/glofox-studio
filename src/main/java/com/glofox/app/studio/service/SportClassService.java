@@ -6,20 +6,24 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class SportClassService {
 
     private final SportClassRepository sportClassRepository;
 
+    @Transactional(readOnly = true)
     public List<SportClass> findAllSportClasses() {
         return sportClassRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Optional<SportClass> findSportClassById(Integer id) {
         return sportClassRepository.findById(id);
     }

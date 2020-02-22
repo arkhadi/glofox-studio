@@ -2,6 +2,7 @@ package com.glofox.app.studio.controller;
 
 import com.glofox.app.studio.entity.SportClass;
 import com.glofox.app.studio.service.SportClassService;
+import com.glofox.app.studio.validator.SportClassValidator;
 import com.sun.javafx.binding.StringFormatter;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,14 @@ public class SportClassController {
 
     private final SportClassService sportClassService;
 
+    private final SportClassValidator sportClassValidator;
+
     @PostMapping
-    public ResponseEntity<SportClass>  createSportClass(@Valid @RequestBody SportClass sportClass) {
+    public ResponseEntity  createSportClass(@Valid @RequestBody SportClass sportClass) {
+        String validationErrors = sportClassValidator.validate(sportClass);
+        if(validationErrors != null) {
+            return ResponseEntity.badRequest().body(validationErrors);
+        }
         return ResponseEntity.ok(sportClassService.saveSportClass(sportClass));
     }
 

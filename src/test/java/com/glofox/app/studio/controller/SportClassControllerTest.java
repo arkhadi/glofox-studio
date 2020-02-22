@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.glofox.app.studio.entity.SportClass;
 import com.glofox.app.studio.service.SportClassService;
+import com.glofox.app.studio.validator.SportClassValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +36,10 @@ class SportClassControllerTest {
     @MockBean
     private SportClassService sportClassService;
 
+    @MockBean
+    private SportClassValidator sportClassValidator;
+
+
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -56,6 +61,7 @@ class SportClassControllerTest {
         sportClass.setStartDate(date);
         sportClass.setEndDate(date);
 
+        given(sportClassValidator.validate(sportClass)).willReturn(null);
         given(sportClassService.saveSportClass(any(SportClass.class))).willReturn(sportClass);
 
         //When
@@ -89,6 +95,30 @@ class SportClassControllerTest {
         //Then
         assertThat(result).isNotNull();
         assertThat(result.getResponse().getContentAsString()).contains("End Date is mandatory", "Name is mandatory", "Start Date is mandatory", "Capacity is mandatory");
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenCreateSportClassFailsToValidateDueToOverlappingDates() throws Exception {
+        //Given
+        LocalDate date = LocalDate.of(2020, 2, 20);
+        SportClass sportClass = new SportClass();
+        sportClass.setName("name");
+        sportClass.setCapacity(20);
+        sportClass.setStartDate(date);
+        sportClass.setEndDate(date);
+
+        given(sportClassValidator.validate(any(SportClass.class))).willReturn("Failed to validate Dates");
+        
+        //When
+        MvcResult result = mvc.perform(post("/classes")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sportClass)))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        //Then
+        assertThat(result).isNotNull();
+        assertThat(result.getResponse().getContentAsString()).contains("Failed to validate Dates");
     }
 
     @Test
